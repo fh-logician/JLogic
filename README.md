@@ -4,7 +4,7 @@ A Java project for parsing and evaluating logical expressions such as those in D
 
 ## Process of Parsing
 
-In order to parse a logical expression, JLogic will use the `parseExpression` method in `logicTree.java` to iterate through the entire expression.
+In order to parse a logical expression, JLogic will use the `parseExpression` method in `LogicTree.java` to iterate through the entire expression.
 It removes all the spaces beforehand because spaces don't necessarily matter in the parsing.
 
 It will then return an object of the type `Expression` which holds information pertaining to the expressions stored as a `LogicNode` object as the root of a `LogicTree`.
