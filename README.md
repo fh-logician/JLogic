@@ -64,7 +64,7 @@ As you can tell with that last one, parentheses are automatically added because 
 ## Offline Application
 
 As far as `Java` goes, there is no `.jar` application built yet but I am working on that at the moment. For now, below are links for applications for specific OS's.
- * [Windows](https://tinyurl.copm/PyLogicW)
+ * [Windows](https://tinyurl.com/y57mghpl)
 
 ## Feedback, Suggestions, Bugs
 
