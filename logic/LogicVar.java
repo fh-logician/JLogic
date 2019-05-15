@@ -18,8 +18,9 @@ public class LogicVar implements LogicElement {
     public static final int PSEUDO = 0;
     public static final int LOGIC = 1;
     public static final int CODE = 2;
+    public static final int BOOLEAN = 3;
 
-    public static final String[] OPERATORS = {"not ", "~", "!"};
+    public static final String[] OPERATORS = {"not ", "~", "!", "-"};
 
     // Instance Fields
 
@@ -107,6 +108,17 @@ public class LogicVar implements LogicElement {
      */
     public int getOperatorType() {
         return operatorType;
+    }
+
+    // Setter Methods
+
+    /**
+     * Sets the operator type this LogicVar object has.
+     *
+     * @param operatorType The type of operator
+     */
+    public void setOperatorType(int operatorType) {
+        this.operatorType = operatorType;
     }
 
     // Evaluation Methods
