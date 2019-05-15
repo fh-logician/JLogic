@@ -15,6 +15,7 @@ import logic.LogicVar;
 import util.Evaluation;
 import util.Expression;
 import util.TruthValue;
+import util.QuineMcCluskey;
 
 /**
  * A class for a LogicTree that represents a logical expression
@@ -24,22 +25,22 @@ public class LogicTree {
     // Static Fields
 
     public static final String[] INPUT_OPERATORS = {
-        "NAND", "nand",
-        "NOR", "nor",
-        "OR", "or", "||",
-        "AND", "and", "&&",
-        "NOT ", "not ", "NOT", "not", "!",
+        "NAND", "nand", "-*",
+        "NOR", "nor", "-+",
+        "OR", "or", "||", "+",
+        "AND", "and", "&&", "*",
+        "NOT ", "not ", "NOT", "not", "!", "-",
         "IFF", "iff", "<->",
         "IMPLIES", "implies", "->"
     };
 
     public static final String[] OUTPUT_OPERATORS = {
-        "|", "|",
-        ":", ":",
-        "v", "v", "v",
-        "^", "^", "^",
-        "~", "~", "~", "~", "~",
-        "-", "-", "-",
+        "|", "|", "|",
+        ":", ":", ":",
+        "v", "v", "v", "v",
+        "^", "^", "^", "^",
+        "~", "~", "~", "~", "~", "~",
+        "=", "=", "=",
         ">", ">", ">"
     };
 
@@ -105,7 +106,7 @@ public class LogicTree {
         Expression exp = parseExpression(expression);
 
         if (exp.isSingle())
-            this.root = ((LogicNode) exp.getRoot()).getLeft();
+            this.root = (LogicVar) exp.getRoot();
         else
             this.root = exp.getRoot();
         
@@ -178,6 +179,25 @@ public class LogicTree {
         }
 
         return evaluations;
+    }
+
+    public boolean[] getExpressionTruths() {
+
+        // Get the evaluations and keep track of each value
+        LinkedList<Evaluation> evaluations = getTruthValues();
+        LinkedList<Boolean> values = new LinkedList<>();
+        for (int i = 0; i < evaluations.size(); i++) {
+            Evaluation evaluation = evaluations.get(i);
+            if (evaluation.getExpression().equals(this.toString()))
+                values.add(evaluation.getValue());
+        }
+
+        // Turn the values into an array
+        boolean[] valuesArray = new boolean[values.size()];
+        for (int i = 0; i < values.size(); i++)
+            valuesArray[i] = values.get(i);
+        return valuesArray;
+        
     }
 
     public String[] makeTable() {
@@ -269,6 +289,65 @@ public class LogicTree {
             newLines[i] = lines.get(i);
         
         return newLines;
+    }
+
+    /**
+     * Returns a truth table as a String for this LogicTree object
+     *
+     * @return String
+     */
+    public String makeTableAsString() {
+        String[] lines = makeTable();
+        String result = "";
+        for (int i = 0; i < lines.length; i++)
+            result += lines[i] + "\n";
+        return result;
+    }
+
+    public String simplify() {
+
+        // Get the operator type
+        int operatorType = this.root.getOperatorType();
+
+        // Get the solver data
+        //  First we need to get the indexes where the Node is True and invert the number
+        //  For example: if the expression is True at indexes 0, 1, and 3, then the new list would be
+        //      4, 6, 7
+        LinkedList<Integer> trueAt = new LinkedList<>();
+        boolean[] truths = getExpressionTruths();
+        for (int value = 0; value < truths.length; value++)
+            if (truths[value])
+                trueAt.add(truths.length - value - 1);
+        
+        // Turn the trueAt into an array
+        int[] trueAtArray = new int[trueAt.size()];
+        for (int i = 0; i < trueAt.size(); i++)
+            trueAtArray[i] = trueAt.get(i);
+        
+        // Create a QuineMcCluskey object
+        QuineMcCluskey qm = new QuineMcCluskey(this.variables, trueAtArray);
+        String function = qm.getFunction();
+
+        // Replace AND, NOT, and OR with proper symbols
+        if (operatorType == LogicNode.PSEUDO)
+            function = function.replace("AND", "and").replace("OR", "or").replace("NOT ", "not ");
+        else if (operatorType == LogicNode.LOGIC)
+            function = function.replace("AND", "^").replace("OR", "v").replace("NOT ", "~");
+        else if (operatorType == LogicNode.CODE)
+            function = function.replace("AND", "&&").replace("OR", "||").replace("NOT ", "!");
+        else if (operatorType == LogicNode.BOOLEAN)
+            function = function.replace("AND", "*").replace("OR", "+").replace("NOT ", "-");
+        
+        System.out.println(function);
+        
+        // Check if function is always true or always false
+        if (function.equals("1"))
+            return "Always True";
+        else if (function.equals("0"))
+            return "Always False";
+        
+        // Function is not always true or always false
+        return (new LogicTree(function)).toString();
     }
 
     public void printTable() {
@@ -446,7 +525,7 @@ public class LogicTree {
                 for (int opType: operatorTypes) {
 
                     for (String operator: LogicNode.OPERATORS[opType])
-                        if (OUTPUT_OPERATORS[i].equals(operator)) {
+                        if (INPUT_OPERATORS[i].equals(operator)) {
                             operatorType = opType;
                             doBreak = true;
                             break;
@@ -652,6 +731,6 @@ public class LogicTree {
      * @return Expression
      */
     public static Expression parseExpression(String expression) {
-        return parseExpression(expression, false, LogicNode.LOGIC);
+        return parseExpression(expression, false, NONE);
     }
 }
