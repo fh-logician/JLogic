@@ -22,11 +22,13 @@ public class LogicNode implements LogicElement {
     public static final int PSEUDO = 0;
     public static final int LOGIC = 1;
     public static final int CODE = 2;
+    public static final int BOOLEAN = 3;
 
     public static final String[][] OPERATORS = {
         {"not ", "and", "or", "implies", "iff", "nand", "nor"},
         {"~", "^", "v", "->", "<->", "|", "â¬‡"},
-        {"!", "&&", "||", "->", "<->", "|", "â¬‡"}
+        {"!", "&&", "||", "->", "<->", "|", "â¬‡"},
+        {"-", "*", "+", "->", "<->", "-*", "-+"}
     };
 
     // Instance Fields
@@ -56,6 +58,9 @@ public class LogicNode implements LogicElement {
         if (operatorType < 0 || operatorType > 2)
             operatorType = LOGIC;
         this.operatorType = operatorType;
+
+        this.left.setOperatorType(operatorType);
+        this.right.setOperatorType(operatorType);
     }
 
     /**
@@ -156,6 +161,17 @@ public class LogicNode implements LogicElement {
      */
     public String getNot() {
         return OPERATORS[operatorType][NOT];
+    }
+
+    // Setter Methods
+
+    /**
+     * Sets the type of operator that this LogicNode object has.
+     *
+     * @param operatorType The type of operator
+     */
+    public void setOperatorType(int operatorType) {
+        this.operatorType = operatorType;
     }
 
     // Evaluation Methods
