@@ -10,6 +10,7 @@ import util.TruthValue;
 public interface LogicElement {
 
     public int getOperatorType();
+    public void setOperatorType(int operatorType);
     public boolean hasNot();
     public String getNot();
     public LinkedList<Evaluation> getTruthValues(LinkedList<TruthValue> truthValues);
